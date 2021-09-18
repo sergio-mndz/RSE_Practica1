@@ -1,12 +1,12 @@
 /*
- * encription.h
+ * encryption.h
  *
  *  Created on: 18 sep 2021
  *      Author: sergio_mndz
  */
 
-#ifndef RSE_PRACTICA1_ENCRIPTION_H_
-#define RSE_PRACTICA1_ENCRIPTION_H_
+#ifndef RSE_PRACTICA1_ENCRYPTION_H_
+#define RSE_PRACTICA1_ENCRYPTION_H_
 
 #include "aes.h"
 #include "tcpecho.h"
@@ -32,4 +32,4 @@ const char* encrypt_message(struct AES_ctx* ctx, uint8_t* buf);
 
 const char* decrypt_message(struct AES_ctx* ctx, uint8_t* buf);
 
-#endif /* RSE_PRACTICA1_ENCRIPTION_H_ */
+#endif /* RSE_PRACTICA1_ENCRYPTION_H_ */

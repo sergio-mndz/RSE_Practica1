@@ -1,11 +1,11 @@
 /*
- * encription.c
+ * encryption.c
  *
  *  Created on: 18 sep 2021
  *      Author: sergio_mndz
  */
 
-#include "encription.h"
+#include <RSE_Practica1/encryption.h>
 
 //TODO: Definir si el contexto se declarará en la capa de aplicacion o
 //		en este archivo, seguramente en la de aplicación

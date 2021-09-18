@@ -8,6 +8,6 @@
 #ifndef RSE_PRACTICA1_APPLICATION_H_
 #define RSE_PRACTICA1_APPLICATION_H_
 
-#include "aes.h"
+#include "encryption.h"
 
 #endif /* RSE_PRACTICA1_APPLICATION_H_ */
