@@ -26,8 +26,10 @@
 
 #include <stdio.h>
 
-const char* encrypt_message(uint8_t* buf);
+void AES_setup(struct AES_ctx* ctx, const uint8_t* key);
 
-const char* decrypt_message(uint8_t* buf);
+const char* encrypt_message(struct AES_ctx* ctx, uint8_t* buf);
+
+const char* decrypt_message(struct AES_ctx* ctx, uint8_t* buf);
 
 #endif /* RSE_PRACTICA1_ENCRIPTION_H_ */
