@@ -24,6 +24,10 @@
 #include "fsl_enet_mdio.h"
 #include "fsl_device_registers.h"
 
+#include <stdio.h>
 
+const char* encrypt_message(uint8_t* buf);
+
+const char* decrypt_message(uint8_t* buf);
 
 #endif /* RSE_PRACTICA1_ENCRIPTION_H_ */
