@@ -7,13 +7,41 @@
 
 #include "comm.h"
 
-static void tcp_connect(void *arg)
+void client_write(int message_id)
+{
+
+	&Rx_msg = encrypt_message();
+
+	if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
+		(void)netconn_write(conn, (void*)Tx_msg, strlen(Tx_msg), NETCONN_COPY);
+		while(ERR_OK != (netconn_recv(conn, &buf))){}
+		do {
+			netbuf_data(buf, (void*)Rx_msg, &len);
+			printf("%s", (u8_t*)Rx_msg);
+		} while (netbuf_next(buf) >= 0);
+		netconn_close(conn);
+	} else {
+		//Nothing
+	}
+}
+
+static void start_encrypted_comm_client(int msg_id)
 {
 	struct netconn *conn, *newconn;
 	err_t err;
-	LWIP_UNUSED_ARG(arg);
 	ip4_addr_t netif_ServerIP;
 	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
+	u8_t *Tx_msg;
+	u8_t *Tx_msg_encrypted;
+	u16_t len;
+	u8_t *Rx_msg;
+	u8_t *Rx_msg_encrypted;
+	struct netbuf *buf;
+
+	struct AES_ctx ctx;
+	uint8_t key[] = "123 key";
+
+	AES_setup(&ctx, key);
 
 	/* Create a new connection identifier. */
 	/* Bind connection to well known port number 7. */
@@ -26,28 +54,6 @@ static void tcp_connect(void *arg)
 	#endif /* LWIP_IPV6 */
 
 	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
-}
-
-static void init_encrypted_comm()
-{
-	struct AES_ctx ctx;
-	uint8_t key[] = "123 key";
-	tcp_connect(NULL);
-	AES_setup(&ctx, key);
-}
-
-void client_write(int message_id)
-{
-	struct netconn *conn;
-	u8_t *Tx_msg;
-	u8_t *Tx_msg_encrypted;
-	u16_t len;
-	u8_t *Rx_msg;
-	struct netbuf *buf;
-
-	ip4_addr_t netif_ServerIP;
-	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
-	conn = netconn_new(NETCONN_TCP);
 
 	switch(message_id)
 	{
@@ -67,17 +73,20 @@ void client_write(int message_id)
 		strcpy(Tx_msg, message_1);
 	}
 
-	&Rx_msg = encrypt_message();
+	&Tx_msg_encrypted = encrypt_message(&ctx, &Tx_msg);
 
-	if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
-		(void)netconn_write(conn, (void*)Tx_msg, strlen(Tx_msg), NETCONN_COPY);
-		while(ERR_OK != (netconn_recv(conn, &buf))){}
-		do {
-			netbuf_data(buf, (void*)Rx_msg, &len);
-			printf("%s", (u8_t*)Rx_msg);
-		} while (netbuf_next(buf) >= 0);
-		netconn_close(conn);
-	} else {
-		//Nothing
+	while (1) {
+		//New Code
+		if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
+			(void)netconn_write(conn, (void*)Tx_msg_encrypted, strlen(Tx_msg_encrypted), NETCONN_COPY);
+			while(ERR_OK != (netconn_recv(conn, &buf))){}
+			do {
+				  netbuf_data(buf, (void*)Rx_msg_encrypted, &len);
+			      printf("Received encrypted message: %s", (u8_t*)Rx_msg_encrypted);
+			} while (netbuf_next(buf) >= 0);
+			netconn_close(conn);
+		} else {
+			//Nothing
+		}
 	}
 }

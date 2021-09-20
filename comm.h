@@ -27,10 +27,6 @@ u8_t message_2[] = {"Como estas?"};
 u8_t message_3[] = {"ITESO"};
 u8_t message_4[] = {"Sistemas"};
 
-static void tcp_connect(void *arg);
-
-static void init_encrypted_comm();
-
-void client_write(int message_id);
+static void start_encrypted_comm_client(int msg_id);
 
 #endif /* COMM_H_ */
