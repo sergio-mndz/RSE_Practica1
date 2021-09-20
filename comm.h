@@ -8,18 +8,29 @@
 #ifndef COMM_H_
 #define COMM_H_
 
-#include "aes.h"
+#include "encryption.h"
 
 #include "lwip/opt.h"
 #include "lwip/sys.h"
 #include "lwip/api.h"
 
 #include "stdio.h"
+#include "string.h"
+
+#define MESSAGE_1 1
+#define MESSAGE_2 2
+#define MESSAGE_3 3
+#define MESSAGE_4 4
+
+u8_t message_1[] = {"Hola server"};
+u8_t message_2[] = {"Como estas?"};
+u8_t message_3[] = {"ITESO"};
+u8_t message_4[] = {"Sistemas"};
 
 static void tcp_connect(void *arg);
 
-void client_write(int message_id);
+static void init_encrypted_comm();
 
-void client_recieve();
+void client_write(int message_id);
 
 #endif /* COMM_H_ */
