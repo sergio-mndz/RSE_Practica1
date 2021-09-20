@@ -7,25 +7,7 @@
 
 #include "comm.h"
 
-void client_write(int message_id)
-{
-
-	&Rx_msg = encrypt_message();
-
-	if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
-		(void)netconn_write(conn, (void*)Tx_msg, strlen(Tx_msg), NETCONN_COPY);
-		while(ERR_OK != (netconn_recv(conn, &buf))){}
-		do {
-			netbuf_data(buf, (void*)Rx_msg, &len);
-			printf("%s", (u8_t*)Rx_msg);
-		} while (netbuf_next(buf) >= 0);
-		netconn_close(conn);
-	} else {
-		//Nothing
-	}
-}
-
-static void start_encrypted_comm_client(int msg_id)
+static void start_encrypted_comm_client(void *arg)
 {
 	struct netconn *conn, *newconn;
 	err_t err;
@@ -37,6 +19,7 @@ static void start_encrypted_comm_client(int msg_id)
 	u8_t *Rx_msg;
 	u8_t *Rx_msg_encrypted;
 	struct netbuf *buf;
+	int msg_id = MESSAGE_1;
 
 	struct AES_ctx ctx;
 	uint8_t key[] = "123 key";
@@ -55,7 +38,7 @@ static void start_encrypted_comm_client(int msg_id)
 
 	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
 
-	switch(message_id)
+	switch(msg_id)
 	{
 	case MESSAGE_1:
 		strcpy(Tx_msg, message_1);
@@ -73,7 +56,7 @@ static void start_encrypted_comm_client(int msg_id)
 		strcpy(Tx_msg, message_1);
 	}
 
-	&Tx_msg_encrypted = encrypt_message(&ctx, &Tx_msg);
+	Tx_msg_encrypted = encrypt_message(&ctx, Tx_msg);
 
 	while (1) {
 		//New Code
@@ -83,10 +66,17 @@ static void start_encrypted_comm_client(int msg_id)
 			do {
 				  netbuf_data(buf, (void*)Rx_msg_encrypted, &len);
 			      printf("Received encrypted message: %s", (u8_t*)Rx_msg_encrypted);
-			} while (netbuf_next(buf) >= 0);
+			      Rx_msg = decrypt_message(&ctx, Rx_msg_encrypted);
+			      printf("Received message: %s", (u8_t*)Rx_msg);
+ 			} while (netbuf_next(buf) >= 0);
 			netconn_close(conn);
 		} else {
 			//Nothing
 		}
 	}
+}
+
+void tcpclient_init(void)
+{
+	sys_thread_new("start_encrypted_comm_clinet", start_encrypted_comm_client, NULL, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
 }

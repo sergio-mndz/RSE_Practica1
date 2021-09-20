@@ -26,10 +26,10 @@
 
 #include <stdio.h>
 
-void AES_setup(struct AES_ctx* ctx, const uint8_t* key);
+void AES_setup(struct AES_ctx* ctx, const u8_t* key);
 
-const char* encrypt_message(struct AES_ctx* ctx, uint8_t* buf);
+const char* encrypt_message(struct AES_ctx* ctx, u8_t* buf);
 
-const char* decrypt_message(struct AES_ctx* ctx, uint8_t* buf);
+const char* decrypt_message(struct AES_ctx* ctx, u8_t* buf);
 
 #endif /* RSE_PRACTICA1_ENCRYPTION_H_ */

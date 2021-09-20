@@ -11,12 +11,12 @@
 //		en este archivo, seguramente en la de aplicación
 //struct AES_ctx ctx;
 
-void AES_setup(struct AES_ctx* ctx, const uint8_t* key)
+void AES_setup(struct AES_ctx* ctx, const u8_t* key)
 {
 	AES_init_ctx(&ctx, key);
 }
 
-const char* encrypt_message(struct AES_ctx* ctx, uint8_t* buf)
+const char* encrypt_message(struct AES_ctx* ctx, u8_t* buf)
 {
 	static uint8_t* encrypted;
 	strcpy(encrypted, buf);
@@ -24,7 +24,7 @@ const char* encrypt_message(struct AES_ctx* ctx, uint8_t* buf)
 	return encrypted;
 }
 
-const char* decrypt_message(struct AES_ctx* ctx, uint8_t* buf)
+const char* decrypt_message(struct AES_ctx* ctx, u8_t* buf)
 {
 	static uint8_t* decrypted;
 	strcpy(decrypted, buf);
