@@ -25,7 +25,7 @@ static void start_encrypted_comm_client(void *arg)
 	struct AES_ctx ctx;
 	uint8_t key[] = "123 key";
 
-	AES_setup(&ctx, key);
+	AES_init_ctx(&ctx, key);
 
 	/* Create a new connection identifier. */
 	/* Bind connection to well known port number 7. */
@@ -89,7 +89,88 @@ static void start_encrypted_comm_server(void *arg)
 	u16_t len;
 	u8_t *Rx_msg;
 	u8_t *Rx_msg_encrypted;
+	int Tx_msg_num;
 	struct netbuf *buf;
+
+	struct AES_ctx ctx;
+	uint8_t key[] = "123 key";
+
+	AES_init_ctx(&ctx, key);
+
+	/* Create a new connection identifier. */
+	/* Bind connection to well known port number 7. */
+	#if LWIP_IPV6
+	  conn = netconn_new(NETCONN_TCP_IPV6);
+	  netconn_bind(conn, IP6_ADDR_ANY, 7);
+	#else /* LWIP_IPV6 */
+	  conn = netconn_new(NETCONN_TCP);
+	//  netconn_bind(conn, IP_ADDR_ANY, 7);
+	#endif /* LWIP_IPV6 */
+
+	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
+
+	err = netconn_accept(conn, &newconn);
+
+	while(1)
+	{
+		if(ERR_OK == (netconn_recv(newconn, &buf)))
+		{
+			do{
+				netbuf_data(buf, (void*)Tx_msg_encrypted, &len);
+				Tx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
+				Tx_msg_num = check_Tx_msg(Tx_msg);
+				switch(Tx_msg_num)
+				{
+				case MESSAGE_1:
+					strcpy(Rx_msg, Rx_message_1);
+					break;
+				case MESSAGE_2:
+					strcpy(Rx_msg, Rx_message_2);
+					break;
+				case MESSAGE_3:
+					strcpy(Rx_msg, Rx_message_3);
+					break;
+				case MESSAGE_4:
+					strcpy(Rx_msg, Rx_message_4);
+					break;
+				default:
+					strcpy(Rx_msg, Rx_message_1);
+				}
+				Rx_msg_encrypted = encrypt_message(&ctx, Rx_msg);
+				err = netconn_write(newconn, (void*)Rx_msg_encrypted, strlen(Rx_msg_encrypted), NETCONN_COPY);
+				if (err != ERR_OK) {
+					printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
+				}
+			}while(netbuf_next(buf) >= 0);
+		}
+		else
+		{
+			//Nothing
+		}
+	}
+}
+
+int check_Tx_msg(char* msg){
+	if(strcmp(msg, Tx_message_1))
+	{
+		return MESSAGE_1;
+	}
+	else if(strcmp(msg, Tx_message_2))
+	{
+		return MESSAGE_2;
+	}
+	else if(strcmp(msg, Tx_message_3))
+	{
+		return MESSAGE_3;
+	}
+	else if(strcmp(msg, Tx_message_4))
+	{
+		return MESSAGE_4;
+	}
+	else
+	{
+		return MESSAGE_1;
+	}
 }
 
 void tcpclient_init(void)
