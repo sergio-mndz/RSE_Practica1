@@ -7,15 +7,15 @@
 
 #include "comm.h"
 
-const u8_t Tx_message_1[16] = "Hola server11111" ;
-const u8_t Tx_message_2[16] = "Como estas?11111";
-const u8_t Tx_message_3[16] = "ITESO11111111111";
-const u8_t Tx_message_4[16] = "Sistemas11111111";
+u8_t Tx_message_1[] = "Hola server11111" ;
+u8_t Tx_message_2[] = "Como estas?11111";
+u8_t Tx_message_3[] = "ITESO11111111111";
+u8_t Tx_message_4[] = "Sistemas11111111";
 
-const u8_t Rx_message_1[16] = "Hola cliente1111";
-const u8_t Rx_message_2[16] = "Bien111111111111";
-const u8_t Rx_message_3[16] = "DESI111111111111";
-const u8_t Rx_message_4[16] = "Embebidos1111111";
+u8_t Rx_message_1[] = "Hola cliente1111";
+u8_t Rx_message_2[] = "Bien111111111111";
+u8_t Rx_message_3[] = "DESI111111111111";
+u8_t Rx_message_4[] = "Embebidos1111111";
 
 void stack_init(void *arg)
 {
@@ -66,7 +66,7 @@ static void start_encrypted_comm_client(void *arg)
 	ip4_addr_t netif_ServerIP;
 	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
 	LWIP_UNUSED_ARG(arg);
-	u8_t *Tx_msg;
+	u8_t Tx_msg[16];
 	u8_t *Tx_msg_encrypted;
 	u16_t len;
 	u8_t *Rx_msg;
@@ -91,6 +91,8 @@ static void start_encrypted_comm_client(void *arg)
 
 	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
 
+	printf("Llego 1\n");
+
 	switch(msg_id)
 	{
 	case MESSAGE_1:
@@ -108,9 +110,12 @@ static void start_encrypted_comm_client(void *arg)
 	default:
 		strcpy(Tx_msg, Tx_message_1);
 	}
+	printf("%s\n", Tx_msg);
 
 	Tx_msg_encrypted = encrypt_message(&ctx, Tx_msg);
-
+	printf("%s\n", Tx_msg_encrypted);
+//	Rx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
+//	printf("%s\n", Rx_msg);
 	while (1) {
 		//New Code
 		if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
@@ -133,14 +138,12 @@ static void start_encrypted_comm_server(void *arg)
 {
 	struct netconn *conn, *newconn;
 	err_t err;
-	ip4_addr_t netif_ServerIP;
-	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
 	LWIP_UNUSED_ARG(arg);
-	u8_t *Tx_msg;
-	u8_t *Tx_msg_encrypted;
+	u8_t* Tx_msg;
+	u8_t* Tx_msg_encrypted;
 	u16_t len;
-	u8_t *Rx_msg;
-	u8_t *Rx_msg_encrypted;
+	u8_t Rx_msg[16];
+	u8_t* Rx_msg_encrypted;
 	int Tx_msg_num;
 	struct netbuf *buf;
 
@@ -156,17 +159,21 @@ static void start_encrypted_comm_server(void *arg)
 	  netconn_bind(conn, IP6_ADDR_ANY, 7);
 	#else /* LWIP_IPV6 */
 	  conn = netconn_new(NETCONN_TCP);
-	//  netconn_bind(conn, IP_ADDR_ANY, 7);
+	  netconn_bind(conn, IP_ADDR_ANY, 7);
 	#endif /* LWIP_IPV6 */
 
 	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
 
-	err = netconn_accept(conn, &newconn);
+	netconn_listen(conn);
 
 	while(1)
 	{
+		err = netconn_accept(conn, &newconn);
+		if (err == ERR_OK) {
+			printf("Acepto una connexión\n ");
 		if(ERR_OK == (netconn_recv(newconn, &buf)))
 		{
+			printf("Recibio mensaje\n");
 			do{
 				netbuf_data(buf, (void*)Tx_msg_encrypted, &len);
 				Tx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
@@ -197,7 +204,8 @@ static void start_encrypted_comm_server(void *arg)
 		}
 		else
 		{
-			//Nothing
+			printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
+		}
 		}
 	}
 }
