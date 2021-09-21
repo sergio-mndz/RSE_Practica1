@@ -7,15 +7,15 @@
 
 #include "comm.h"
 
-const u8_t Tx_message_1[] = "Hola server";
-const u8_t Tx_message_2[] = "Como estas?";
-const u8_t Tx_message_3[] = "ITESO";
-const u8_t Tx_message_4[] = "Sistemas";
+const u8_t Tx_message_1[16] = "Hola server11111" ;
+const u8_t Tx_message_2[16] = "Como estas?11111";
+const u8_t Tx_message_3[16] = "ITESO11111111111";
+const u8_t Tx_message_4[16] = "Sistemas11111111";
 
-const u8_t Rx_message_1[] = "Hola cliente";
-const u8_t Rx_message_2[] = "Bien";
-const u8_t Rx_message_3[] = "DESI";
-const u8_t Rx_message_4[] = "Embebidos";
+const u8_t Rx_message_1[16] = "Hola cliente1111";
+const u8_t Rx_message_2[16] = "Bien111111111111";
+const u8_t Rx_message_3[16] = "DESI111111111111";
+const u8_t Rx_message_4[16] = "Embebidos1111111";
 
 void stack_init(void *arg)
 {

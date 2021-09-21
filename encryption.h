@@ -28,8 +28,8 @@
 
 void AES_setup(struct AES_ctx* ctx, const u8_t* key);
 
-const char* encrypt_message(struct AES_ctx* ctx, u8_t* buf);
+char* encrypt_message(struct AES_ctx* ctx, u8_t* buf);
 
-const char* decrypt_message(struct AES_ctx* ctx, u8_t* buf);
+char* decrypt_message(struct AES_ctx* ctx, u8_t* buf);
 
 #endif /* RSE_PRACTICA1_ENCRYPTION_H_ */
