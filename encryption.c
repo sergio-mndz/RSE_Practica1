@@ -18,7 +18,7 @@ void AES_setup(struct AES_ctx* ctx, const u8_t* key)
 
 const char* encrypt_message(struct AES_ctx* ctx, u8_t* buf)
 {
-	static uint8_t* encrypted;
+	uint8_t* encrypted;
 	strcpy(encrypted, buf);
 	AES_ECB_encrypt(&ctx, encrypted);
 	return encrypted;
@@ -26,7 +26,7 @@ const char* encrypt_message(struct AES_ctx* ctx, u8_t* buf)
 
 const char* decrypt_message(struct AES_ctx* ctx, u8_t* buf)
 {
-	static uint8_t* decrypted;
+	uint8_t* decrypted;
 	strcpy(decrypted, buf);
 	AES_ECB_decrypt(&ctx, decrypted);
 	return decrypted;
