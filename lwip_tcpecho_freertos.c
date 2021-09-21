@@ -99,67 +99,70 @@ static phy_handle_t phyHandle   = {.phyAddr = EXAMPLE_PHY_ADDRESS, .mdioHandle =
  *
  * @param arg unused
  */
-static void stack_init(void *arg)
-{
-    static struct netif netif;
-    ip4_addr_t netif_ipaddr, netif_netmask, netif_gw;
-    ethernetif_config_t enet_config = {
-        .phyHandle  = &phyHandle,
-        .macAddress = configMAC_ADDR,
-    };
-
-    LWIP_UNUSED_ARG(arg);
-
-    mdioHandle.resource.csrClock_Hz = EXAMPLE_CLOCK_FREQ;
-
-    IP4_ADDR(&netif_ipaddr, configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3);
-    IP4_ADDR(&netif_netmask, configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3);
-    IP4_ADDR(&netif_gw, configGW_ADDR0, configGW_ADDR1, configGW_ADDR2, configGW_ADDR3);
-
-    tcpip_init(NULL, NULL);
-
-    netifapi_netif_add(&netif, &netif_ipaddr, &netif_netmask, &netif_gw, &enet_config, EXAMPLE_NETIF_INIT_FN,
-                       tcpip_input);
-    netifapi_netif_set_default(&netif);
-    netifapi_netif_set_up(&netif);
-
-    PRINTF("\r\n************************************************\r\n");
-    PRINTF(" TCP Echo example\r\n");
-    PRINTF("************************************************\r\n");
-    PRINTF(" IPv4 Address     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_ipaddr)[0], ((u8_t *)&netif_ipaddr)[1],
-           ((u8_t *)&netif_ipaddr)[2], ((u8_t *)&netif_ipaddr)[3]);
-    PRINTF(" IPv4 Subnet mask : %u.%u.%u.%u\r\n", ((u8_t *)&netif_netmask)[0], ((u8_t *)&netif_netmask)[1],
-           ((u8_t *)&netif_netmask)[2], ((u8_t *)&netif_netmask)[3]);
-    PRINTF(" IPv4 Gateway     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_gw)[0], ((u8_t *)&netif_gw)[1],
-           ((u8_t *)&netif_gw)[2], ((u8_t *)&netif_gw)[3]);
-    PRINTF("************************************************\r\n");
-
-    tcpecho_init();
-
-    vTaskDelete(NULL);
-}
+//static void stack_init(void *arg)
+//{
+//    static struct netif netif;
+//    ip4_addr_t netif_ipaddr, netif_netmask, netif_gw;
+//    ethernetif_config_t enet_config = {
+//        .phyHandle  = &phyHandle,
+//        .macAddress = configMAC_ADDR,
+//    };
+//
+//    LWIP_UNUSED_ARG(arg);
+//
+//    mdioHandle.resource.csrClock_Hz = EXAMPLE_CLOCK_FREQ;
+//
+//    IP4_ADDR(&netif_ipaddr, configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3);
+//    IP4_ADDR(&netif_netmask, configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3);
+//    IP4_ADDR(&netif_gw, configGW_ADDR0, configGW_ADDR1, configGW_ADDR2, configGW_ADDR3);
+//
+//    tcpip_init(NULL, NULL);
+//
+//    netifapi_netif_add(&netif, &netif_ipaddr, &netif_netmask, &netif_gw, &enet_config, EXAMPLE_NETIF_INIT_FN,
+//                       tcpip_input);
+//    netifapi_netif_set_default(&netif);
+//    netifapi_netif_set_up(&netif);
+//
+//    PRINTF("\r\n************************************************\r\n");
+//    PRINTF(" TCP Echo example\r\n");
+//    PRINTF("************************************************\r\n");
+//    PRINTF(" IPv4 Address     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_ipaddr)[0], ((u8_t *)&netif_ipaddr)[1],
+//           ((u8_t *)&netif_ipaddr)[2], ((u8_t *)&netif_ipaddr)[3]);
+//    PRINTF(" IPv4 Subnet mask : %u.%u.%u.%u\r\n", ((u8_t *)&netif_netmask)[0], ((u8_t *)&netif_netmask)[1],
+//           ((u8_t *)&netif_netmask)[2], ((u8_t *)&netif_netmask)[3]);
+//    PRINTF(" IPv4 Gateway     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_gw)[0], ((u8_t *)&netif_gw)[1],
+//           ((u8_t *)&netif_gw)[2], ((u8_t *)&netif_gw)[3]);
+//    PRINTF("************************************************\r\n");
+//
+//    tcpecho_init();
+//
+//    vTaskDelete(NULL);
+//}
 
 /*!
  * @brief Main function
  */
-int main(void)
-{
-    SYSMPU_Type *base = SYSMPU;
-    BOARD_InitBootPins();
-    BOARD_InitBootClocks();
-    BOARD_InitDebugConsole();
-    /* Disable SYSMPU. */
-    base->CESR &= ~SYSMPU_CESR_VLD_MASK;
 
-    /* Initialize lwIP from thread */
-    if (sys_thread_new("main", stack_init, NULL, INIT_THREAD_STACKSIZE, INIT_THREAD_PRIO) == NULL)
-    {
-        LWIP_ASSERT("main(): Task creation failed.", 0);
-    }
 
-    vTaskStartScheduler();
+//int main(void)
+//{
+//    SYSMPU_Type *base = SYSMPU;
+//    BOARD_InitBootPins();
+//    BOARD_InitBootClocks();
+//    BOARD_InitDebugConsole();
+//    /* Disable SYSMPU. */
+//    base->CESR &= ~SYSMPU_CESR_VLD_MASK;
+//
+//    /* Initialize lwIP from thread */
+//    if (sys_thread_new("main", stack_init, NULL, INIT_THREAD_STACKSIZE, INIT_THREAD_PRIO) == NULL)
+//    {
+//        LWIP_ASSERT("main(): Task creation failed.", 0);
+//    }
+//
+//    vTaskStartScheduler();
+//
+//    /* Will not get here unless a task calls vTaskEndScheduler ()*/
+//    return 0;
+//}
 
-    /* Will not get here unless a task calls vTaskEndScheduler ()*/
-    return 0;
-}
 #endif

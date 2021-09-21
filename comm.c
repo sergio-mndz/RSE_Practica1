@@ -7,6 +7,58 @@
 
 #include "comm.h"
 
+const u8_t Tx_message_1[] = "Hola server";
+const u8_t Tx_message_2[] = "Como estas?";
+const u8_t Tx_message_3[] = "ITESO";
+const u8_t Tx_message_4[] = "Sistemas";
+
+const u8_t Rx_message_1[] = "Hola cliente";
+const u8_t Rx_message_2[] = "Bien";
+const u8_t Rx_message_3[] = "DESI";
+const u8_t Rx_message_4[] = "Embebidos";
+
+void stack_init(void *arg)
+{
+    static struct netif netif;
+    ip4_addr_t netif_ipaddr, netif_netmask, netif_gw;
+    ethernetif_config_t enet_config = {
+        .phyHandle  = &phyHandle,
+        .macAddress = configMAC_ADDR,
+    };
+
+    LWIP_UNUSED_ARG(arg);
+
+    mdioHandle.resource.csrClock_Hz = EXAMPLE_CLOCK_FREQ;
+
+    IP4_ADDR(&netif_ipaddr, configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3);
+    IP4_ADDR(&netif_netmask, configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3);
+    IP4_ADDR(&netif_gw, configGW_ADDR0, configGW_ADDR1, configGW_ADDR2, configGW_ADDR3);
+
+    tcpip_init(NULL, NULL);
+
+    netifapi_netif_add(&netif, &netif_ipaddr, &netif_netmask, &netif_gw, &enet_config, EXAMPLE_NETIF_INIT_FN,
+                       tcpip_input);
+    netifapi_netif_set_default(&netif);
+    netifapi_netif_set_up(&netif);
+
+    PRINTF("\r\n************************************************\r\n");
+    PRINTF(" TCP Echo example\r\n");
+    PRINTF("************************************************\r\n");
+    PRINTF(" IPv4 Address     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_ipaddr)[0], ((u8_t *)&netif_ipaddr)[1],
+           ((u8_t *)&netif_ipaddr)[2], ((u8_t *)&netif_ipaddr)[3]);
+    PRINTF(" IPv4 Subnet mask : %u.%u.%u.%u\r\n", ((u8_t *)&netif_netmask)[0], ((u8_t *)&netif_netmask)[1],
+           ((u8_t *)&netif_netmask)[2], ((u8_t *)&netif_netmask)[3]);
+    PRINTF(" IPv4 Gateway     : %u.%u.%u.%u\r\n", ((u8_t *)&netif_gw)[0], ((u8_t *)&netif_gw)[1],
+           ((u8_t *)&netif_gw)[2], ((u8_t *)&netif_gw)[3]);
+    PRINTF("************************************************\r\n");
+
+    tcpclient_init();
+    //tcpserver_init();
+
+    vTaskDelete(NULL);
+}
+
+
 static void start_encrypted_comm_client(void *arg)
 {
 	struct netconn *conn, *newconn;
