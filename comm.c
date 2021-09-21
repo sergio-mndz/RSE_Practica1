@@ -13,6 +13,7 @@ static void start_encrypted_comm_client(void *arg)
 	err_t err;
 	ip4_addr_t netif_ServerIP;
 	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
+	LWIP_UNUSED_ARG(arg);
 	u8_t *Tx_msg;
 	u8_t *Tx_msg_encrypted;
 	u16_t len;
@@ -41,19 +42,19 @@ static void start_encrypted_comm_client(void *arg)
 	switch(msg_id)
 	{
 	case MESSAGE_1:
-		strcpy(Tx_msg, message_1);
+		strcpy(Tx_msg, Tx_message_1);
 		break;
 	case MESSAGE_2:
-		strcpy(Tx_msg, message_2);
+		strcpy(Tx_msg, Tx_message_2);
 		break;
 	case MESSAGE_3:
-		strcpy(Tx_msg, message_3);
+		strcpy(Tx_msg, Tx_message_3);
 		break;
 	case MESSAGE_4:
-		strcpy(Tx_msg, message_4);
+		strcpy(Tx_msg, Tx_message_4);
 		break;
 	default:
-		strcpy(Tx_msg, message_1);
+		strcpy(Tx_msg, Tx_message_1);
 	}
 
 	Tx_msg_encrypted = encrypt_message(&ctx, Tx_msg);
@@ -74,6 +75,21 @@ static void start_encrypted_comm_client(void *arg)
 			//Nothing
 		}
 	}
+}
+
+static void start_encrypted_comm_server(void *arg)
+{
+	struct netconn *conn, *newconn;
+	err_t err;
+	ip4_addr_t netif_ServerIP;
+	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
+	LWIP_UNUSED_ARG(arg);
+	u8_t *Tx_msg;
+	u8_t *Tx_msg_encrypted;
+	u16_t len;
+	u8_t *Rx_msg;
+	u8_t *Rx_msg_encrypted;
+	struct netbuf *buf;
 }
 
 void tcpclient_init(void)

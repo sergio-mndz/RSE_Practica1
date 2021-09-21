@@ -22,12 +22,19 @@
 #define MESSAGE_3 3
 #define MESSAGE_4 4
 
-u8_t message_1[] = {"Hola server"};
-u8_t message_2[] = {"Como estas?"};
-u8_t message_3[] = {"ITESO"};
-u8_t message_4[] = {"Sistemas"};
+u8_t Tx_message_1[] = {"Hola server"};
+u8_t Tx_message_2[] = {"Como estas?"};
+u8_t Tx_message_3[] = {"ITESO"};
+u8_t Tx_message_4[] = {"Sistemas"};
+
+u8_t Rx_message_1[] = {""};
+u8_t Rx_message_2[] = {""};
+u8_t Rx_message_3[] = {""};
+u8_t Rx_message_4[] = {""};
 
 static void start_encrypted_comm_client(void *arg);
+
+static void start_encrypted_comm_server(void *arg);
 
 void tcpclient_init(void);
 
