@@ -7,15 +7,17 @@
 
 #include "comm.h"
 
-u8_t Tx_message_1[] = "Hola server11111" ;
-u8_t Tx_message_2[] = "Como estas?11111";
-u8_t Tx_message_3[] = "ITESO11111111111";
-u8_t Tx_message_4[] = "Sistemas11111111";
+#define MAX_STRING_SIZE 16
 
-u8_t Rx_message_1[] = "Hola cliente1111";
-u8_t Rx_message_2[] = "Bien111111111111";
-u8_t Rx_message_3[] = "DESI111111111111";
-u8_t Rx_message_4[] = "Embebidos1111111";
+u8_t Tx_message_1[] = "Hola serverS";
+u8_t Tx_message_2[] = "Como estas?";
+u8_t Tx_message_3[] = "ITESM";
+u8_t Tx_message_4[] = "Sistemas";
+
+u8_t Rx_message_1[] = "Hola cliente";
+u8_t Rx_message_2[] = "Bien";
+u8_t Rx_message_3[] = "DESI";
+u8_t Rx_message_4[] = "Embebidos";
 
 void stack_init(void *arg)
 {
@@ -64,20 +66,21 @@ static void start_encrypted_comm_client(void *arg)
 	struct netconn *conn, *newconn;
 	err_t err;
 	ip4_addr_t netif_ServerIP;
-	IP4_ADDR(&netif_ServerIP, 148, 201, 186, 47);
 	LWIP_UNUSED_ARG(arg);
-	u8_t Tx_msg[16];
+	u8_t Tx_msg[MAX_STRING_SIZE];
 	u8_t *Tx_msg_encrypted;
 	u16_t len;
 	u8_t *Rx_msg;
 	u8_t *Rx_msg_encrypted;
 	struct netbuf *buf;
-	int msg_id = MESSAGE_1;
+	int msg_id = MESSAGE_3;
 
 	struct AES_ctx ctx;
 	uint8_t key[] = "123 key";
 
 	AES_init_ctx(&ctx, key);
+
+	IP4_ADDR(&netif_ServerIP, 192, 168, 0, 105);
 
 	/* Create a new connection identifier. */
 	/* Bind connection to well known port number 7. */
@@ -90,46 +93,42 @@ static void start_encrypted_comm_client(void *arg)
 	#endif /* LWIP_IPV6 */
 
 	LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
-
-	printf("Llego 1\n");
-
-	switch(msg_id)
-	{
-	case MESSAGE_1:
-		strcpy(Tx_msg, Tx_message_1);
-		break;
-	case MESSAGE_2:
-		strcpy(Tx_msg, Tx_message_2);
-		break;
-	case MESSAGE_3:
-		strcpy(Tx_msg, Tx_message_3);
-		break;
-	case MESSAGE_4:
-		strcpy(Tx_msg, Tx_message_4);
-		break;
-	default:
-		strcpy(Tx_msg, Tx_message_1);
-	}
-	printf("%s\n", Tx_msg);
-
-	Tx_msg_encrypted = encrypt_message(&ctx, Tx_msg);
-	printf("%s\n", Tx_msg_encrypted);
-//	Rx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
-//	printf("%s\n", Rx_msg);
 	while (1) {
-		//New Code
 		if(ERR_OK == (netconn_connect(conn, &netif_ServerIP, 7))){
+			printf("*** Conexión exitosa ***\n");
+			switch(msg_id)
+			{
+			case MESSAGE_1:
+				strcpy(Tx_msg, Tx_message_1);
+				break;
+			case MESSAGE_2:
+				strcpy(Tx_msg, Tx_message_2);
+				break;
+			case MESSAGE_3:
+				strcpy(Tx_msg, Tx_message_3);
+				break;
+			case MESSAGE_4:
+				strcpy(Tx_msg, Tx_message_4);
+				break;
+			default:
+				strcpy(Tx_msg, Tx_message_1);
+			}
+			printf("Mensaje a enviar: %s\n", Tx_msg);
+
+			Tx_msg_encrypted = encrypt_message(&ctx, Tx_msg);
+			printf("Mensaje ecriptado a enviar: %s\n", Tx_msg_encrypted);
 			(void)netconn_write(conn, (void*)Tx_msg_encrypted, strlen(Tx_msg_encrypted), NETCONN_COPY);
+			printf("*** Mensaje enviado ***\n");
 			while(ERR_OK != (netconn_recv(conn, &buf))){}
 			do {
-				  netbuf_data(buf, (void*)Rx_msg_encrypted, &len);
-			      printf("Received encrypted message: %s", (u8_t*)Rx_msg_encrypted);
-			      Rx_msg = decrypt_message(&ctx, Rx_msg_encrypted);
-			      printf("Received message: %s", (u8_t*)Rx_msg);
- 			} while (netbuf_next(buf) >= 0);
+				  netbuf_data(buf, (void*)(&Rx_msg_encrypted), &len);
+				  printf("Mensaje encriptado recibido: %s\n", (u8_t*)Rx_msg_encrypted);
+				  Rx_msg = decrypt_message(&ctx, Rx_msg_encrypted);
+				  printf("Mensaje recibido: %s\n", (u8_t*)Rx_msg);
+			} while (netbuf_next(buf) >= 0);
 			netconn_close(conn);
 		} else {
-			//Nothing
+//			printf("tcpecho: netconn_connect: error \"%s\"\n", lwip_strerr(err));
 		}
 	}
 }
@@ -142,7 +141,7 @@ static void start_encrypted_comm_server(void *arg)
 	u8_t* Tx_msg;
 	u8_t* Tx_msg_encrypted;
 	u16_t len;
-	u8_t Rx_msg[16];
+	u8_t Rx_msg[MAX_STRING_SIZE];
 	u8_t* Rx_msg_encrypted;
 	int Tx_msg_num;
 	struct netbuf *buf;
@@ -211,19 +210,19 @@ static void start_encrypted_comm_server(void *arg)
 }
 
 int check_Tx_msg(char* msg){
-	if(strcmp(msg, Tx_message_1))
+	if(strcmp(msg, Tx_message_1)==0)
 	{
 		return MESSAGE_1;
 	}
-	else if(strcmp(msg, Tx_message_2))
+	else if(strcmp(msg, Tx_message_2)==0)
 	{
 		return MESSAGE_2;
 	}
-	else if(strcmp(msg, Tx_message_3))
+	else if(strcmp(msg, Tx_message_3)==0)
 	{
 		return MESSAGE_3;
 	}
-	else if(strcmp(msg, Tx_message_4))
+	else if(strcmp(msg, Tx_message_4)==0)
 	{
 		return MESSAGE_4;
 	}
