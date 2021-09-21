@@ -175,5 +175,10 @@ int check_Tx_msg(char* msg){
 
 void tcpclient_init(void)
 {
-	sys_thread_new("start_encrypted_comm_clinet", start_encrypted_comm_client, NULL, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
+	sys_thread_new("start_encrypted_comm_client", start_encrypted_comm_client, NULL, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
+}
+
+void tcpserver_init(void)
+{
+	sys_thread_new("start_encrypted_comm_server", start_encrypted_comm_server, NULL, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
 }

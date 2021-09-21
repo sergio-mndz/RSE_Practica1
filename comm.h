@@ -40,4 +40,6 @@ int check_Tx_msg(char* msg);
 
 void tcpclient_init(void);
 
+void tcpserver_init(void);
+
 #endif /* COMM_H_ */
