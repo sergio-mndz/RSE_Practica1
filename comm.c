@@ -9,9 +9,9 @@
 
 #define MAX_STRING_SIZE 16
 
-u8_t Tx_message_1[] = "Hola serverS";
+u8_t Tx_message_1[] = "Hola server";
 u8_t Tx_message_2[] = "Como estas?";
-u8_t Tx_message_3[] = "ITESM";
+u8_t Tx_message_3[] = "ITESO";
 u8_t Tx_message_4[] = "Sistemas";
 
 u8_t Rx_message_1[] = "Hola cliente";
@@ -169,42 +169,51 @@ static void start_encrypted_comm_server(void *arg)
 	{
 		err = netconn_accept(conn, &newconn);
 		if (err == ERR_OK) {
-			printf("Acepto una connexión\n ");
-		if(ERR_OK == (netconn_recv(newconn, &buf)))
-		{
-			printf("Recibio mensaje\n");
-			do{
-				netbuf_data(buf, (void*)Tx_msg_encrypted, &len);
-				Tx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
-				Tx_msg_num = check_Tx_msg(Tx_msg);
-				switch(Tx_msg_num)
-				{
-				case MESSAGE_1:
-					strcpy(Rx_msg, Rx_message_1);
-					break;
-				case MESSAGE_2:
-					strcpy(Rx_msg, Rx_message_2);
-					break;
-				case MESSAGE_3:
-					strcpy(Rx_msg, Rx_message_3);
-					break;
-				case MESSAGE_4:
-					strcpy(Rx_msg, Rx_message_4);
-					break;
-				default:
-					strcpy(Rx_msg, Rx_message_1);
-				}
-				Rx_msg_encrypted = encrypt_message(&ctx, Rx_msg);
-				err = netconn_write(newconn, (void*)Rx_msg_encrypted, strlen(Rx_msg_encrypted), NETCONN_COPY);
-				if (err != ERR_OK) {
-					printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
-				}
-			}while(netbuf_next(buf) >= 0);
+			printf("Acepto una connexion\n");
+			if(ERR_OK == (netconn_recv(newconn, &buf)))
+			{
+				do{
+					netbuf_data(buf, (void *)(&Tx_msg_encrypted), &len);
+					printf("Cadena encriptada recibida:\t%s\n", (u8_t*)Tx_msg_encrypted);
+					Tx_msg = decrypt_message(&ctx, Tx_msg_encrypted);
+					printf("Cadena desencriptada recibida: \t%s\n", (u8_t*)Tx_msg);
+					Tx_msg_num = check_Tx_msg(Tx_msg);
+					switch(Tx_msg_num)
+					{
+					case MESSAGE_1:
+						strcpy(Rx_msg, Rx_message_1);
+						break;
+					case MESSAGE_2:
+						strcpy(Rx_msg, Rx_message_2);
+						break;
+					case MESSAGE_3:
+						strcpy(Rx_msg, Rx_message_3);
+						break;
+					case MESSAGE_4:
+						strcpy(Rx_msg, Rx_message_4);
+						break;
+					default:
+						strcpy(Rx_msg, Rx_message_1);
+					}
+					printf("Cadena a enviar:\t\t%s\n", (u8_t*)Rx_msg);
+					Rx_msg_encrypted = encrypt_message(&ctx, Rx_msg);
+					printf("Cadena encriptada a enviar:\t%s\n", (u8_t*)Rx_msg_encrypted);
+					err = netconn_write(newconn, (void*)Rx_msg_encrypted, strlen(Rx_msg_encrypted), NETCONN_COPY);
+					if (err != ERR_OK) {
+						printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
+					}
+				}while(netbuf_next(buf) >= 0);
+				netbuf_delete(buf);
+				netconn_close(newconn);
+				netconn_delete(newconn);
+			}
+			else
+			{
+				printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
+			}
 		}
-		else
-		{
-			printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
-		}
+		else{
+			printf("tcpecho: accpet: error \"%s\"\n", lwip_strerr(err));
 		}
 	}
 }
